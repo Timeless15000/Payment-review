@@ -31,7 +31,7 @@ input#q{flex:1;min-width:160px;background:var(--card);border:1px solid var(--lin
 .badge{font-size:12px;color:var(--mut);margin-top:3px}
 .since{color:var(--amb);font-weight:600}
 .tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:6px;vertical-align:1px}
-.t-TPM{background:#efe7fb;color:#7b4fce}.t-SOR{background:#e2f5ea;color:#2f8f4e}.t-TCC{background:#e2f1fb;color:#1e6fe0}
+.t-TPM{background:#efe7fb;color:#7b4fce}.t-SOR{background:#e2f5ea;color:#2f8f4e}.t-TCC{background:#e2f1fb;color:#1e6fe0}.t-TF{background:#fdeee2;color:#c05621}
 .count{display:flex;flex-direction:column;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;line-height:1}
 .count .num{font-size:24px;font-weight:800}
 .count .lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:3px;opacity:.85}
@@ -122,7 +122,7 @@ function setSort(k){sortKey=k;document.getElementById('bC').classList.toggle('on
 function setEnt(e){ent=e;teamF='ALL';[...document.querySelectorAll('#ents button')].forEach(b=>b.classList.toggle('on',b.dataset.e===e));render()}
 function subset(){return ent==='ALL'?DATA:DATA.filter(x=>x.ent===ent)}
 function tabs(){
- const el=document.getElementById('ents');const LBL={TCC:'TCCS'};const order=['SOR','TCC','TPM'];
+ const el=document.getElementById('ents');const LBL={TCC:'TCCS'};const order=['SOR','TCC','TPM','TF'];
  el.innerHTML=order.map(e=>{const cnt=e==='ALL'?DATA.length:DATA.filter(x=>x.ent===e).length;return `<button data-e="${e}" class="${e===ent?'on':''}" onclick="setEnt('${e}')">${e==='ALL'?'All entities':(LBL[e]||e)}</button>`}).join('');
 }
 function kpis(){

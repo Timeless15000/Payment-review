@@ -29,7 +29,7 @@
    - Redirect URI: `http://localhost:8080/callback`
 2. 생성 후 **Client ID** 복사, **Generate a secret** → **Client Secret** 복사
 3. 클론 폴더에서 **GET_TOKEN.bat 더블클릭** → ID/Secret 붙여넣기
-   → 브라우저 열리면 Xero 로그인 → **3개 법인(TPM, SOR, TCC) 모두 체크** → Allow
+   → 브라우저 열리면 Xero 로그인 → **4개 법인(TPM, SOR, TCC, TF/Teamforce) 모두 체크** → Allow
 4. 검은 창에 나오는 긴 **REFRESH TOKEN** 복사
 
 ※ 주의: 직원 대시보드의 기존 토큰은 재사용 불가 (이 버전은 이메일·연락처
@@ -60,6 +60,7 @@ Branch: **main**, 폴더: **/(root)** → Save.
 
 ## 이후엔 전부 자동
 
+- 법인 4개: SOR / TCCS / TPM / TF
 - 주중 시드니 9시/1시쯤 자동 갱신 (즉시 갱신: Actions → Run workflow)
 - 토큰은 실행 때마다 스스로 갱신 (token.json)
 

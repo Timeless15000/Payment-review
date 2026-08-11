@@ -10,7 +10,7 @@ Usage (in a terminal / command prompt, in this folder):
     python authorize.py
 
 A browser window opens -> log in to Xero -> on the "allow access" screen
-TICK ALL THREE organisations (TPM, SOR, TCC) -> Allow.
+TICK ALL FOUR organisations (TPM, SOR, TCC, TF/Teamforce) -> Allow.
 The script prints your REFRESH TOKEN. Copy it; you'll paste it into GitHub
 as the secret XERO_REFRESH_TOKEN.
 """
@@ -44,7 +44,7 @@ def main():
     print(">>> AUTH URL:", auth_url)
     srv = http.server.HTTPServer(("localhost", 8080), H)
     threading.Thread(target=srv.handle_request, daemon=True).start()
-    print("Opening browser to authorise. TICK ALL 3 ORGANISATIONS on the consent screen.")
+    print("Opening browser to authorise. TICK ALL 4 ORGANISATIONS (TPM, SOR, TCC, TF) on the consent screen.")
     webbrowser.open(auth_url)
     while "code" not in code_holder:
         pass

@@ -17,12 +17,13 @@ import requests
 CLIENT_ID = os.environ["XERO_CLIENT_ID"]
 CLIENT_SECRET = os.environ["XERO_CLIENT_SECRET"]
 
-ENTITY_ORDER = ["SOR", "TCC", "TPM"]
-ENTITY_LABEL = {"SOR": "SOR", "TCC": "TCCS", "TPM": "TPM"}
+ENTITY_ORDER = ["SOR", "TCC", "TPM", "TF"]
+ENTITY_LABEL = {"SOR": "SOR", "TCC": "TCCS", "TPM": "TPM", "TF": "TF"}
 ENAMES = {"ALL": "All entities", "TPM": "Timeless Property Maintenance",
-          "SOR": "SOR Services", "TCC": "Timeless Commercial Clean Sydney"}
+          "SOR": "SOR Services", "TCC": "Timeless Commercial Clean Sydney",
+          "TF": "Teamforce"}
 # fallback short-codes if the API doesn't return one
-ORG_FALLBACK = {"SOR": "!1jrRM", "TCC": "!xWj4p", "TPM": "!Z8FyC"}
+ORG_FALLBACK = {"SOR": "!1jrRM", "TCC": "!xWj4p", "TPM": "!Z8FyC", "TF": ""}
 
 
 def entity_code(tenant_name):
@@ -30,6 +31,7 @@ def entity_code(tenant_name):
     if "property maintenance" in n: return "TPM"
     if "sor services" in n:         return "SOR"
     if "commercial clean" in n:     return "TCC"
+    if "teamforce" in n:            return "TF"
     return None
 
 
