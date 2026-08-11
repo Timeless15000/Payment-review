@@ -1,0 +1,37 @@
+name: Update dashboard
+
+on:
+  schedule:
+    - cron: '0 23 * * 0-4'   # ~9am Sydney, weekdays (drifts ~1h in daylight saving)
+    - cron: '0 3 * * 1-5'    # ~1pm Sydney, weekdays
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-dashboard
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests
+      - name: Build dashboard
+        env:
+          XERO_CLIENT_ID: ${{ secrets.XERO_CLIENT_ID }}
+          XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
+          XERO_REFRESH_TOKEN: ${{ secrets.XERO_REFRESH_TOKEN }}
+        run: python build_dashboard.py
+      - name: Commit result
+        run: |
+          git config user.name "dashboard-bot"
+          git config user.email "actions@github.com"
+          git add index.html token.json
+          git diff --cached --quiet || git commit -m "Auto update dashboard"
+          git push

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Outstanding Invoices — Timeless Group</title>
+<style>
+:root{--bg:#f4f6f8;--card:#ffffff;--line:#e3e8ee;--txt:#1f2933;--mut:#6b7885;--accent:#1e6fe0;--accent2:#e8f0fd;--red:#d64545;--amb:#c77700;--grn:#2f8f4e}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:20px;margin:0 0 2px}.sub{color:var(--mut);font-size:13px}
+.tr{display:flex;align-items:center;gap:12px}
+.refresh{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+.refresh:hover{background:#155ac0}.refresh svg{width:15px;height:15px}
+.updated{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:12px;white-space:nowrap}
+.updated .dot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex:none}
+.ent-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.ent-tabs button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--mut);cursor:pointer}
+.ent-tabs button.on{background:#101828;color:#fff;border-color:#101828}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}.topbar{align-items:flex-start}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.kpi .v{font-size:22px;font-weight:700}.kpi .l{color:var(--mut);font-size:12px;margin-top:4px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--mut);padding:8px 14px;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--accent);color:#fff;font-weight:600}
+input#q{flex:1;min-width:160px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:14px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.head{display:grid;grid-template-columns:34px 62px 1fr auto;gap:14px;align-items:center;padding:12px 14px;cursor:pointer}
+.rank{color:var(--mut);font-weight:700;font-size:14px;text-align:center}
+.name{font-weight:600;font-size:14px}
+.badge{font-size:12px;color:var(--mut);margin-top:3px}
+.since{color:var(--amb);font-weight:600}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;margin-right:6px;vertical-align:1px}
+.t-TPM{background:#efe7fb;color:#7b4fce}.t-SOR{background:#e2f5ea;color:#2f8f4e}.t-TCC{background:#e2f1fb;color:#1e6fe0}
+.count{display:flex;flex-direction:column;align-items:center;justify-content:center;width:56px;height:56px;border-radius:14px;line-height:1}
+.count .num{font-size:24px;font-weight:800}
+.count .lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:3px;opacity:.85}
+.c-hi{background:#fdecec;color:var(--red);border:1px solid #f6c9c9}
+.c-md{background:#fdf1df;color:var(--amb);border:1px solid #f4dcae}
+.c-lo{background:var(--accent2);color:var(--accent);border:1px solid #cfe0fb}.c-paid{background:#e6f6ec;color:var(--grn);border:1px solid #bfe6cd}
+.amt{font-weight:700;font-size:15px;min-width:104px;text-align:right}
+.det{display:none;padding:0 14px 12px 110px}
+.row.open .det{display:block}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:6px 8px;border-top:1px solid var(--line);text-align:left}
+th{color:var(--mut);font-weight:500}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.ref{color:var(--mut)}
+.invlink{color:var(--accent);text-decoration:none;font-weight:600}.invlink:hover{text-decoration:underline}
+.copybtn,.openx{display:inline-block;cursor:pointer;margin-left:6px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;border:1px solid #d0d7de;background:#f6f8fa;color:#374151;text-decoration:none;vertical-align:middle;line-height:1.5}
+.copybtn:hover{background:#eef1f4}
+.openx{border-color:#bcd7c9;background:#eafaf1;color:#137a4b}.openx:hover{background:#d9f2e4}
+.termmark{display:inline-block;margin-left:6px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:#fde2e2;color:#b91c1c;border:1px solid #f5b5b5;vertical-align:middle}
+.teamlbl{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;vertical-align:middle}
+.team-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.team-tabs button{font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;border:1px solid #d0d7de;background:#fff;color:#374151;cursor:pointer}
+.team-tabs button.on{background:#111827;color:#fff;border-color:#111827}
+.od{color:var(--red)}.ok{color:var(--grn)}
+th.n{text-align:right}
+.det td:nth-child(4),.det th:nth-child(4){width:120px}
+.det td:nth-child(5),.det th:nth-child(5){width:96px}
+.pill{display:inline-block;min-width:40px;text-align:center;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600}
+.pill.od{background:#fdecec;color:var(--red)}
+.pill.ok{background:#eef1f4;color:#9aa6b2}
+.foot{color:var(--mut);font-size:12px;margin-top:18px;line-height:1.5}
+.chev{transition:transform .15s;display:inline-block}.row.open .chev{transform:rotate(90deg)}
+
+#gate{position:fixed;inset:0;background:#f4f6f8;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+#gate.hidden{display:none}#gate .box{background:#fff;border:1px solid #e3e8ee;border-radius:16px;padding:30px 26px;max-width:320px;width:88%;text-align:center;box-shadow:0 8px 30px rgba(16,24,40,.12)}
+#gate input{width:100%;padding:11px 12px;border:1px solid #e3e8ee;border-radius:9px;font-size:15px;margin:14px 0 6px}
+#gate button{background:#1e6fe0;color:#fff;border:0;border-radius:9px;padding:11px 18px;font-weight:600;cursor:pointer;width:100%;font-size:14px}#gate .err{color:#d64545;font-size:13px;min-height:18px}
+
+/* Payment Review view */
+.prh2{font-size:15px;margin:26px 0 8px;padding-left:9px;border-left:4px solid #13B5EA}
+.prh2.red{border-color:#c1272d}.prh2.or{border-color:#e65100}.prh2.ye{border-color:#c9a400}.prh2.bl{border-color:#1266a5}
+.prh2 small{color:#777;font-weight:normal;font-size:12px}
+.prtable{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9dee3;font-size:13px;margin-bottom:4px}
+.prtable th{text-align:left;font-size:12px;color:#555;background:#f7f8f9;border-bottom:2px solid #d9dee3;padding:8px 10px;border-top:0}
+.prtable td{border-top:0;border-bottom:1px solid #e9edf0;padding:7px 10px;vertical-align:top}
+.prtable tr.cust td{background:#eef6fb;font-weight:bold;border-top:2px solid #cfe3ef}
+.prtag{font-weight:bold;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;white-space:nowrap}
+.prtag.red{background:#c1272d;color:#fff}.prtag.or{background:#e65100;color:#fff}.prtag.ye{background:#c9a400;color:#fff}.prtag.bl{background:#1266a5;color:#fff}
+.prtable tr.gapr td{color:#2e7d32;font-style:italic;background:#f4faf4}
+.od1{color:#8a949e}.od2{color:#e65100;font-weight:bold}.od3{color:#c1272d;font-weight:bold}
+.prtable td.amt,.prtable th.amt{text-align:right;white-space:nowrap}
+.prtable td.em{font-size:12px;word-break:break-all;max-width:190px}
+.prbar{position:sticky;top:0;background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:8px 12px;margin:0 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.prbar button{border:none;border-radius:6px;padding:7px 14px;font-weight:bold;cursor:pointer;font-size:12px}
+.prbtn{background:#0B6E4F;color:#fff}.prsel{background:#e3e8ec;color:#333}
+.pdfck{transform:scale(1.15);margin-right:6px;vertical-align:-2px;cursor:pointer}
+.wwred{color:#c1272d;font-weight:bold}
+.prtable td:first-child,.prtable th:first-child{white-space:nowrap}
+.prnone{background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:14px}
+</style></head><body>
+<div id="gate"><div class="box"><div style="font-size:34px">&#128274;</div>
+<h2 style="margin:10px 0 2px;font-size:18px">Outstanding Invoices</h2>
+<div style="color:#6b7885;font-size:13px">Enter password to view</div>
+<input id="gp" type="password" placeholder="Password" autofocus>
+<div class="err" id="ge"></div><button onclick="unlock()">View dashboard</button></div></div><div class="wrap">
+<div class="topbar">
+ <div><h1>Outstanding Invoices</h1>
+ <div class="sub">Timeless Group · 3 Xero entities · snapshot as at __ASAT__ (__TZ__) &middot; SOR shows sites with 2+ unpaid</div></div>
+ <div class="tr">
+   <span class="updated"><span class="dot"></span>Updated __UPDATED__</span>
+ </div>
+</div>
+<div class="ent-tabs" id="ents"></div>
+<div class="team-tabs" id="teams"></div>
+<div class="kpis" id="kpis"></div>
+<div class="controls">
+<div class="seg"><button id="bC" class="on" onclick="setSort('count')">Rank by count</button><button id="bA" onclick="setSort('total')">Rank by $ amount</button><button id="bT" onclick="setSort('termi')">&#128308; Terminated</button><button id="bP" onclick="setSort('pay')">&#128203; Payment Review</button></div>
+<input id="q" placeholder="Search site…" oninput="render()"><input id="payref" style="display:none;min-width:200px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:14px" placeholder="Ref filter: ww1, ww2, ww3 (empty = all)" oninput="payRefChanged()">
+</div>
+<div id="list"></div>
+<div class="foot">Combined receivables across all three Xero entities (TPM = Timeless Property Maintenance, SOR = SOR Services, TCC = Timeless Commercial Clean Sydney). Use the entity tabs to filter. Ranked by unpaid-invoice count (ties by amount); coloured badge red 5+, amber 3&ndash;4, blue 1&ndash;2. &ldquo;Unpaid from&rdquo; = oldest unpaid invoice&rsquo;s month. Refresh reloads the latest saved version; data auto-refreshes from Xero on weekdays at 9am & 1pm.</div>
+</div>
+<script>
+const DATA=__DATA__;const ENAMES=__ENAMES__;const TERMI=__TERMI__;const PAY=__PAY__;const ORGSC=__ORGSC__;let sortKey='count';let ent='SOR';
+function money(n){return n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function cls(c){return c>=5?'c-hi':c>=3?'c-md':'c-lo'}
+function setSort(k){sortKey=k;document.getElementById('bC').classList.toggle('on',k==='count');document.getElementById('bA').classList.toggle('on',k==='total');document.getElementById('bT').classList.toggle('on',k==='termi');document.getElementById('bP').classList.toggle('on',k==='pay');document.getElementById('payref').style.display=(k==='pay')?'':'none';document.getElementById('q').placeholder=(k==='pay')?'Search customer…':'Search site…';render()}
+function setEnt(e){ent=e;teamF='ALL';[...document.querySelectorAll('#ents button')].forEach(b=>b.classList.toggle('on',b.dataset.e===e));render()}
+function subset(){return ent==='ALL'?DATA:DATA.filter(x=>x.ent===ent)}
+function tabs(){
+ const el=document.getElementById('ents');const LBL={TCC:'TCCS'};const order=['SOR','TCC','TPM'];
+ el.innerHTML=order.map(e=>{const cnt=e==='ALL'?DATA.length:DATA.filter(x=>x.ent===e).length;return `<button data-e="${e}" class="${e===ent?'on':''}" onclick="setEnt('${e}')">${e==='ALL'?'All entities':(LBL[e]||e)}</button>`}).join('');
+}
+function kpis(){
+ if(sortKey==='pay'){kpisPay();return;}
+ if(sortKey==='termi'){var d0=TERMI.filter(x=>x.ent===ent).filter(teamOK);var ow=d0.filter(x=>!x.paid);var tt=ow.reduce(function(a,b){return a+b.total;},0);document.getElementById('kpis').innerHTML=`<div class="kpi"><div class="v">${d0.length}</div><div class="l">Terminated 2026</div></div><div class="kpi"><div class="v" style="color:var(--red)">${ow.length}</div><div class="l">Still owing</div></div><div class="kpi"><div class="v">$${money(tt)}</div><div class="l">Owing total</div></div><div class="kpi"><div class="v" style="color:var(--grn)">${d0.length-ow.length}</div><div class="l">Paid</div></div>`;return;}
+ const d=subset().filter(teamOK);const inv=d.reduce((a,b)=>a+b.count,0);
+ const tot=d.reduce((a,b)=>a+b.total,0);
+ const od=d.reduce((a,b)=>a+b.invoices.filter(v=>v.days).reduce((s,v)=>s+v.amount,0),0);
+ const sites=d.length;
+ document.getElementById('kpis').innerHTML=`
+ <div class="kpi"><div class="v">$${money(tot)}</div><div class="l">Total outstanding</div></div>
+ <div class="kpi"><div class="v" style="color:var(--amb)">$${money(od)}</div><div class="l">Overdue</div></div>
+ <div class="kpi"><div class="v">${inv}</div><div class="l">Unpaid invoices</div></div>
+ <div class="kpi"><div class="v">${sites}</div><div class="l">Sites</div></div>`;
+}
+function tdnum(s){s=String(s||'').trim();if(!s)return 0;var d=Date.parse(s);if(!isNaN(d))return d;var m=s.match(/([A-Za-z]{3,})[,\s]+(\d{4})/);if(m){var mo={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11}[m[1].slice(0,3).toLowerCase()];if(mo!=null)return new Date(+m[2],mo,1).getTime();}return 0;}
+function render(){
+ kpis();teamsBar();
+ if(sortKey==='pay'){renderPay();return;}
+ const q=document.getElementById('q').value.toLowerCase();
+ let d=subset().filter(x=>x.site.toLowerCase().includes(q));
+ d=d.slice().sort((a,b)=> sortKey==='count' ? (b.count-a.count||b.total-a.total) : (b.total-a.total||b.count-a.count));
+ if(sortKey==='termi'){d=TERMI.filter(x=>x.ent===ent).filter(x=>x.site.toLowerCase().includes(q));d=d.slice().sort(function(a,b){return (a.paid===b.paid?0:(a.paid?1:-1))||(tdnum(b.termdate)-tdnum(a.termdate))||(b.total-a.total);});}
+ if(ent==='SOR'&&teamF!=='ALL'){d=d.filter(teamOK);}
+ const el=document.getElementById('list');el.innerHTML='';
+ d.forEach((s,i)=>{
+  const div=document.createElement('div');div.className='row';
+  let inv='<table><tr><th>Number</th><th>Ref</th><th>Month</th><th class="n">Amount</th><th class="n">Overdue</th></tr>';
+  s.invoices.forEach(v=>{inv+=`<tr><td>${(v.id&&v.id.length>20)?`<a class="invlink" href="${vurl(s.ent,v.id)}" target="_blank" rel="noopener">${v.inv||''}</a>`:(v.inv||'')}</td><td class="ref">${v.ref||'—'}</td><td class="ref">${v.my||'—'}</td><td class="n">$${money(v.amount)}</td><td class="n">${v.days?`<span class="pill od">${v.days}d</span>`:`<span class="pill ok">—</span>`}</td></tr>`});
+  inv+='</table>';
+  const tag=ent==='ALL'?`<span class="tag t-${s.ent}">${LBL[s.ent]||s.ent}</span>`:'';
+  var _t=(sortKey==='termi');var _p=_t&&s.paid;
+  var _badge=_p?`<div class="count c-paid"><span class="num">&#10003;</span><span class="lbl">paid</span></div>`:`<div class="count ${cls(s.count)}"><span class="num">${s.count}</span><span class="lbl">unpaid</span></div>`;
+  var _line=_t?(`<span class="since">terminated ${s.termdate||''}</span>`+(_p?' &middot; paid in full':' &middot; '+s.count+' unpaid')):(s.oldest?`<span class="chev">&#9654;</span> &middot; <span class="since">unpaid from ${s.oldest}</span>`:`<span class="chev">&#9654;</span> click to expand`);
+  var _amt=_p?'':`$${money(s.total)}`;
+  var _det=_p?`<div class="det" style="padding:10px 14px;color:var(--grn)">Paid in full (not in Awaiting Payment)</div>`:`<div class="det">${inv}</div>`;
+  var _copy=_p?'':`<span class="copybtn" title="Copy reminder email" data-site="${escAttr(s.site.replace(/^[=*]/,''))}" data-amt="$${money(s.total)}" data-count="${s.count}" onclick="copyEmail(event,this)">Copy Email</span>`;
+  var _open=_p?'':`<a class="openx" href="${xurl(s.ent,s.site)}" target="_blank" rel="noopener" title="Switch entity and open filtered Awaiting Payment in Xero" onclick="event.stopPropagation()">Open in Xero</a>`;
+  var isTerm=_t||TERMSET.has(s.ent+'|'+tnorm(s.site));
+  var _termmark=isTerm?`<span class="termmark">Terminated</span>`:'';
+  var _team=teamLabel(s);
+  div.innerHTML=`<div class="head" onclick="this.parentNode.classList.toggle('open')">
+   <div class="rank">${i+1}</div>
+   ${_badge}
+   <div><div class="name">${tag}${s.site} ${_termmark}${_team}${_copy}${_open}</div><div class="badge">${_line}</div></div>
+   <div class="amt">${_amt}</div></div>
+   ${_det}`;
+  el.appendChild(div);
+ });
+}
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function copyEmail(ev,el){ev.stopPropagation();var d=el.dataset;var tpl='Dear "",\n\nThe current outstanding is '+d.amt+'.\n'+d.count+' invoices have to be paid urgently.\nPlease arrange the payment at your earliest convenience.';navigator.clipboard.writeText(tpl).then(function(){var o=el.innerHTML;el.innerHTML='&#10003;';setTimeout(function(){el.innerHTML=o;},1200);});}
+function xk(name){var s=String(name).replace(/^[=*]/,'').trim();var m=s.match(/\b(?:SP|DP)\s*(\d{3,})/i);var k;if(m){k=m[1];}else{var t=s.split(/[ ()\-,\/.\[\]]+/).filter(function(x){return x && ['the','a','sp','dp','pty','ltd'].indexOf(x.toLowerCase())<0;});k=t[0]||s;if(k.length<4 && t[1])k=k+' '+t[1];}return k.toLowerCase();}
+var ORG=ORGSC;
+function xurl(entCode,name){var k=xk(name);var inner='/AccountsReceivable/Search.aspx?invoiceStatus=INVOICESTATUS/AUTHORISED&graphSearch=False&toSearch='+k+'&ref='+k+'&invoiceRef='+k+'&dateWithin=any&pageSize=200&orderBy=PaidToName&direction=ASC&unsentOnly=False';var code=ORG[entCode]||'';return 'https://go.xero.com/OrganisationLogin/?shortCode='+encodeURIComponent(code)+'&redirecturl='+encodeURIComponent(encodeURIComponent(inner));}
+function vurl(entCode,id){var inner='/AccountsReceivable/View.aspx?InvoiceID='+id;var code=ORG[entCode]||'';return 'https://go.xero.com/OrganisationLogin/?shortCode='+encodeURIComponent(code)+'&redirecturl='+encodeURIComponent(encodeURIComponent(inner));}
+function tnorm(s){return String(s||'').replace(/^[.\-|=*\s•]+/,'').trim().toLowerCase();}
+function teamsOf(s){var C=false,teams={};(s.invoices||[]).forEach(function(v){var tok=String(v.ref||'').trim().toLowerCase().split(/\s+/)[0];if(!tok||tok.indexOf('ww')===0)return;var blocks=tok.match(/[scgo]\d/g)||[];var hasS=blocks.some(function(b){return b.charAt(0)==='s';});blocks.forEach(function(b){var L=b.charAt(0),d=b.charAt(1);if(L==='c')C=true;else if(L==='s')teams[d]=1;else if(!hasS)teams[d]=1;});});var out=Object.keys(teams).sort().map(function(d){return 'S'+d;});if(C)out.push('Commercial');if(!out.length&&s.team)out=[s.team];return out;}
+function teamLabel(s){if(s.ent!=='SOR')return '';var out=teamsOf(s);return out.length?'<span class="teamlbl">'+out.join(' · ')+'</span>':'';}
+var teamF='ALL';
+function teamOK(x){return !(ent==='SOR'&&teamF!=='ALL')||teamsOf(x).indexOf(teamF)>=0;}
+function setTeam(t){teamF=t;render();}
+function teamsBar(){var el=document.getElementById('teams');if(!el)return;if(ent!=='SOR'||sortKey==='pay'){el.style.display='none';el.innerHTML='';return;}el.style.display='';var opts=['ALL','Commercial','S1','S2','S3','S4','S5'];el.innerHTML=opts.map(function(t){return '<button class="'+(t===teamF?'on':'')+'" onclick="setTeam(\''+t+'\')">'+(t==='ALL'?'All':t)+'</button>';}).join('');}
+var TERMSET=new Set(TERMI.map(function(t){return t.ent+'|'+tnorm(t.site);}));
+/* ===== Payment Review view (ported from XERO bar Payment Review B9) ===== */
+var PRBUILD='P1';
+var MTP=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function mtxtP(k){return MTP[k%12]+' '+Math.floor(k/12);}
+function prEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function prRef(r){var e=prEsc(r);return e.replace(/^(\s*)(ww)/i,'$1<span class="wwred">$2</span>');}
+function prOdH(d){if(d==null)return '';var c=d>=90?'od3':(d>=30?'od2':'od1');return '<span class="'+c+'">'+d+' days</span>';}
+function prDate(txt){var s=String(txt||'');var MN={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};var m=s.match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})/);if(m){var mo=MN[m[2].toLowerCase()];if(mo)return new Date(parseInt(m[3],10),mo-1,parseInt(m[1],10));}return null;}
+(function(){try{var v=localStorage.getItem('xpay_rf');if(v===null)v='ww1, ww2, ww3';var el=document.getElementById('payref');if(el)el.value=v;}catch(e){}})();
+function payRefChanged(){try{localStorage.setItem('xpay_rf',document.getElementById('payref').value);}catch(e){}render();}
+function payRefRegexes(){var v=(document.getElementById('payref').value||'').replace(/^\s+|\s+$/g,'');if(!v)return null;var t=v.split(',').map(function(s){return s.replace(/^\s+|\s+$/g,'');}).filter(function(s){return s;});if(!t.length)return null;return t.map(function(s){return new RegExp('(^|[^A-Za-z0-9])'+s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^A-Za-z0-9]|$)','i');});}
+function payRows(){var rx=payRefRegexes();var q=(document.getElementById('q').value||'').toLowerCase();
+ return PAY.filter(function(x){if(x.e!==ent)return false;
+  if(q&&String(x.c||'').toLowerCase().indexOf(q)<0)return false;
+  if(rx){var t=String(x.r||''),hit=0;for(var i=0;i<rx.length;i++){if(rx[i].test(t)){hit=1;break;}}if(!hit)return false;}
+  return true;});}
+function analyzePay(rows){
+ var by={};rows.forEach(function(it){var c=it.c;(by[c]=by[c]||[]).push(it);});
+ var nd=new Date();var cur=nd.getFullYear()*12+nd.getMonth();
+ var R={gap:[],late:[],old:[],ok:[],tot:0,due:0,n:rows.length};
+ Object.keys(by).sort().forEach(function(c){
+  var arr=by[c];R.tot++;
+  var ms={};arr.forEach(function(it){ms[it.d]=1;});
+  var keys=[];for(var kk in ms)keys.push(+kk);keys.sort(function(a,b){return a-b;});
+  var tot=0;arr.forEach(function(it){tot+=it.a;});R.due+=tot;
+  var mn=keys[0],mx=keys[keys.length-1];
+  var holes=(mx-mn+1)>keys.length;
+  var past=keys.filter(function(k){return k<=cur;});
+  var run=0;
+  if(past.length){var m2=past[past.length-1];run=1;while(ms[m2-run])run++;}
+  var odmax=null,cid=null,em=null;
+  arr.forEach(function(it){if(it.od!=null&&(odmax==null||it.od>odmax))odmax=it.od;if(!cid&&it.cid)cid=it.cid;if(!em&&it.em)em=it.em;});
+  var o={c:c,arr:arr,keys:keys,ms:ms,tot:tot,run:run,mn:mn,mx:mx,cur:cur,od:odmax,cid:cid,em:em};
+  if(holes){o.cat='gap';R.gap.push(o);}
+  else if(past.length&&past[past.length-1]<cur-1){o.cat='old';o.ago=cur-past[past.length-1];R.old.push(o);}
+  else if(run>=3){o.cat='late';R.late.push(o);}
+  else{o.cat='ok';R.ok.push(o);}
+ });
+ var byOd=function(a,b){var A=(a.od==null?-1:a.od),B=(b.od==null?-1:b.od);if(B!==A)return B-A;if(a.mn!==b.mn)return a.mn-b.mn;return b.tot-a.tot;};
+ R.gap.sort(byOd);R.late.sort(byOd);R.old.sort(byOd);R.ok.sort(byOd);
+ return R;
+}
+function kpisPay(){
+ var R=analyzePay(payRows());window.__prR=R;
+ document.getElementById('kpis').innerHTML=
+  '<div class="kpi"><div class="v">'+R.n+'</div><div class="l">Unpaid invoices</div></div>'
+ +'<div class="kpi"><div class="v">$'+money(R.due)+'</div><div class="l">Total outstanding</div></div>'
+ +'<div class="kpi"><div class="v" style="color:#c1272d">'+R.gap.length+'</div><div class="l">Skipped payment</div></div>'
+ +'<div class="kpi"><div class="v" style="color:#e65100">'+R.late.length+'</div><div class="l">3+ months</div></div>'
+ +'<div class="kpi"><div class="v" style="color:#a07c00">'+R.old.length+'</div><div class="l">2+ months</div></div>'
+ +'<div class="kpi"><div class="v" style="color:#1266a5">'+R.ok.length+'</div><div class="l">Recent unpaid</div></div>';
+}
+function prCu(o){return o.cid?('https://go.xero.com/app/'+(ORG[ent]||'')+'/contacts/contact/'+o.cid+'/activity/invoices'):null;}
+function prCkb(it){return it.id?('<input type="checkbox" class="pdfck" data-id="'+it.id+'" data-num="'+prEsc(it.n||('INV_'+String(it.id).slice(0,8)))+'">'):'';}
+function prRowsFor(o){
+ var out='';var byM={};o.arr.forEach(function(it){(byM[it.d]=byM[it.d]||[]).push(it);});
+ for(var k=o.mn;k<=o.mx;k++){
+  if(byM[k]){byM[k].sort(function(a,b){var da=prDate(a.dt),db=prDate(b.dt);if(da&&db&&da-db)return da-db;if((a.od!=null)&&(b.od!=null)&&b.od!==a.od)return b.od-a.od;return (a.n||'')<(b.n||'')?-1:1;}).forEach(function(it){
+   var lnk=it.n?(it.id?('<a class="invlink" href="'+vurl(ent,it.id)+'" target="_blank" rel="noopener">'+prEsc(it.n)+'</a>'):prEsc(it.n)):'';
+   out+='<tr><td>'+prCkb(it)+mtxtP(k)+'</td><td>'+lnk+'</td><td>'+prRef(it.r)+'</td><td>'+prEsc(it.dt)+'</td><td>'+prOdH(it.od)+'</td><td class="amt">'+money(it.a)+'</td><td class="em"></td></tr>';});}
+  else{var k2=k;while(k2+1<=o.mx&&!byM[k2+1])k2++;
+   out+='<tr class="gapr"><td colspan="7">'+(k2>k?(mtxtP(k)+' - '+mtxtP(k2)):mtxtP(k))+' &middot; Paid</td></tr>';
+   k=k2;}
+ }
+ return out;
+}
+function renderPay(){
+ var R=window.__prR||analyzePay(payRows());window.__prR=null;
+ var h='<div class="prbar"><button class="prbtn" style="background:#1D6F42" onclick="prCsv()">Excel</button>'
+ +'<button class="prsel" onclick="prSel(1)">Select all</button><button class="prsel" onclick="prSel(0)">Clear</button>'
+ +'<button class="prbtn" id="prpdfgo" onclick="prPdfGo()">Download PDFs (<span id="prpdfn">0</span>)</button>'
+ +'<span id="prpdfmsg" style="font-size:12px;color:#666">tick invoices &mdash; PDFs download in a Xero tab (needs Xero login to '+(ENAMES[ent]||ent)+' + the XERO bar)</span></div>';
+ var section=function(list,cls,title,sub,tagf){
+  if(!list.length)return;
+  h+='<h2 class="prh2 '+cls+'">'+title+' ('+list.length+') <small>'+sub+'</small></h2>';
+  h+='<table class="prtable"><thead><tr><th style="width:86px">Month</th><th style="width:120px">Invoice</th><th>Reference</th><th style="width:110px">Date</th><th style="width:96px">Overdue by</th><th class="amt" style="width:110px">Due AUD</th><th style="width:180px">Email</th></tr></thead><tbody>';
+  list.forEach(function(o){
+   var fu=prCu(o);var op=fu?' <a href="'+prEsc(fu)+'" target="_blank" rel="noopener" style="font-size:11px">open in Xero &#8599;</a>':'';
+   h+='<tr class="cust"><td colspan="5">'+prEsc(o.c)+' <span class="prtag '+cls+'">'+tagf(o)+'</span>'+op+'</td><td class="amt">'+money(o.tot)+'</td><td class="em">'+(o.em?'<a href="mailto:'+prEsc(o.em)+'" title="Email in Outlook">'+prEsc(o.em)+'</a>':'')+'</td></tr>'+prRowsFor(o);
+  });
+  h+='</tbody></table>';
+ };
+ section(R.gap,'red','Skipped Payment','unpaid month(s) followed by paid months - the customer likely missed an invoice',function(o){return 'first unpaid '+mtxtP(o.mn);});
+ section(R.late,'or','3+ months','consecutive unpaid months up to now',function(o){return o.run+' months in a row';});
+ section(R.old,'ye','2+ months','no newer invoice in the list after the last unpaid month (service ended? paid since?)',function(o){return 'last unpaid '+mtxtP(o.keys[o.keys.length-1])+' ('+o.ago+' mo ago)';});
+ section(R.ok,'bl','Recent','unpaid in the last 1-2 months only - normal cycle, listed so every overdue invoice is visible',function(o){return (o.run||1)+' mo unpaid';});
+ if(!R.gap.length&&!R.late.length&&!R.old.length&&!R.ok.length)h+='<p class="prnone">No unpaid invoices'+(payRefRegexes()?' matching the ref filter':'')+'.</p>';
+ h+='<div class="foot">Payment Review ['+PRBUILD+'] &middot; grouped from the same Xero data as the dashboard &middot; every overdue invoice is listed, including customers with only the last 1-2 months unpaid ('+R.ok.length+').</div>';
+ document.getElementById('list').innerHTML=h;
+ prCnt();window.__prLast=R;
+}
+function prCsv(){
+ var R=window.__prLast||analyzePay(payRows());
+ var rows=[['Section','Customer','Status','Month','Invoice','Reference','Date','Overdue days','Due AUD','Email']];
+ var add=function(list,name,tagf){list.forEach(function(o){var tg=tagf(o);o.arr.slice().sort(function(a,b){if(a.d!==b.d)return a.d-b.d;var da=prDate(a.dt),db=prDate(b.dt);if(da&&db&&da-db)return da-db;return (a.n||'')<(b.n||'')?-1:1;}).forEach(function(it){rows.push([name,o.c,tg,mtxtP(it.d),it.n||'',it.r||'',it.dt||'',(it.od==null?'':it.od),it.a.toFixed(2),o.em||'']);});});};
+ add(R.gap,'Skipped Payment',function(o){return 'first unpaid '+mtxtP(o.mn);});
+ add(R.late,'3+ months',function(o){return o.run+' months in a row';});
+ add(R.old,'2+ months',function(o){return 'last unpaid '+mtxtP(o.keys[o.keys.length-1])+' ('+o.ago+' mo ago)';});
+ add(R.ok,'Recent',function(o){return (o.run||1)+' mo unpaid';});
+ var esc=function(v){var s=String(v==null?'':v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+ var txt='﻿'+rows.map(function(r){return r.map(esc).join(',');}).join('\r\n');
+ var d=new Date(),z=function(n){return ('0'+n).slice(-2);};
+ var name='Payment_Review_'+ent+'_'+z(d.getDate())+'-'+z(d.getMonth()+1)+'-'+String(d.getFullYear()).slice(-2)+'_'+z(d.getHours())+z(d.getMinutes())+'.csv';
+ var b=new Blob([txt],{type:'text/csv;charset=utf-8'});
+ var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+ setTimeout(function(){try{URL.revokeObjectURL(a.href);a.remove();}catch(e){}},1500);
+}
+function prAll(){return [].slice.call(document.querySelectorAll('.pdfck'));}
+function prSel(v){prAll().forEach(function(c){c.checked=!!v;});prCnt();}
+function prCnt(){var n=prAll().filter(function(c){return c.checked;}).length;var e=document.getElementById('prpdfn');if(e)e.textContent=n;return n;}
+if(!window.__prHk){window.__prHk=1;
+ document.addEventListener('change',function(e){if(e.target&&/pdfck/.test(e.target.className||''))prCnt();});
+ var prLastCk=null;
+ document.addEventListener('click',function(e){var t=e.target;if(!t||!/pdfck/.test(t.className||''))return;var all=prAll();var idx=all.indexOf(t);if(e.shiftKey&&prLastCk!==null&&prLastCk>=0&&idx>=0){var a=Math.min(prLastCk,idx),b=Math.max(prLastCk,idx);for(var i=a;i<=b;i++)all[i].checked=t.checked;}prLastCk=idx;prCnt();});
+ document.addEventListener('mousedown',function(e){if(e.shiftKey&&e.target&&/pdfck/.test(e.target.className||''))e.preventDefault();});
+}
+function prPdfGo(){
+ var picks=prAll().filter(function(c){return c.checked;}).map(function(c){return {id:c.getAttribute('data-id'),num:c.getAttribute('data-num')};});
+ if(!picks.length){alert('No invoices ticked - tick the checkboxes first. (원하는 인보이스에 먼저 체크하세요)');return;}
+ var w=null;try{w=window.open('https://go.xero.com/AccountsReceivable/Search.aspx#xpdf='+encodeURIComponent(JSON.stringify(picks)),'_blank');}catch(e){}
+ if(w){alert('A Xero tab has opened - the PDFs download automatically there.\nNeeds: Xero login to '+(ENAMES[ent]||ent)+' + the XERO bar.\n(Xero 탭이 열렸어요 - 거기서 자동 다운로드됩니다. '+(ENAMES[ent]||ent)+' 로그인 + XERO 바 필요)');}
+ else{alert('Popup blocked - allow pop-ups for this page and press the button again.\n(팝업이 차단됐어요 - 팝업 허용 후 다시 눌러주세요)');}
+}
+/* ===== end Payment Review view ===== */
+tabs();render();
+</script><script>
+const HASH="9198fe8e61d5a7739bb28a1ee51f4cff9b186b6cd0638a92881014495adf81d6";
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function unlock(){const v=document.getElementById('gp').value;if(await sha(v)===HASH){sessionStorage.setItem('ok','1');document.getElementById('gate').classList.add('hidden');}else{document.getElementById('ge').textContent='Wrong password';}}
+if(sessionStorage.getItem('ok')==='1'){document.getElementById('gate').classList.add('hidden');}
+window.addEventListener('load',()=>{const gp=document.getElementById('gp');if(gp)gp.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});});
+</script>
+</body></html>
