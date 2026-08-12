@@ -116,7 +116,53 @@ def parse_date(s):
 
 
 def tnorm(s):
-    return re.sub(r"^[.\-|=*\s•]+", "", str(s or "")).strip().lower()
+    s = re.sub(r"^[.\-|=*\s•]+", "", str(s or ""))
+    return re.sub(r"[\s\-–]+$", "", s).strip().lower()
+
+
+ABBR = {"street": "st", "road": "rd", "avenue": "ave", "drive": "dr",
+        "highway": "hwy", "parade": "pde", "place": "pl", "court": "ct",
+        "crescent": "cres", "lane": "ln", "boulevard": "bvd", "square": "sq"}
+
+
+def mnorm(s):
+    """Looser form for terminated-name matching: tnorm + drop punctuation +
+    abbreviate street words + collapse spaces."""
+    s = re.sub(r"[^a-z0-9 ]", " ", tnorm(s))
+    words = [ABBR.get(w, w) for w in s.split()]
+    return " ".join(words)
+
+
+def spnum(s):
+    m = re.search(r"\b(?:sp|dp)\s*(\d{3,})", str(s or "").lower())
+    return m.group(1) if m else None
+
+
+def match_terminated(site, live, live_items):
+    """Find the live unpaid group for a terminated customer.
+    1) exact normalised name  2) unique SP/DP number  3) unique name-prefix
+    (both compared in a loose form: punctuation removed, Street->St etc)."""
+    n = tnorm(site)
+    if not n:
+        return None
+    a = live.get(n)
+    if a:
+        return a
+    num = spnum(site)
+    if num:
+        hits = [x for k, x in live_items if spnum(k) == num]
+        if len(hits) == 1:
+            return hits[0]
+    nn = mnorm(site)
+    if len(nn) >= 4:
+        hits = []
+        for k, x in live_items:
+            kk = mnorm(k)
+            if len(kk) >= 4 and (kk.startswith(nn) or nn.startswith(kk)):
+                hits.append(x)
+        if len(hits) == 1:
+            return hits[0]
+    return None
 
 
 def build():
@@ -171,7 +217,9 @@ def build():
                     "invoices": [{"inv": i["inv"], "ref": i["ref"], "amount": i["amount"],
                                   "days": i["days"], "my": i["my"], "id": i["id"]} for i in invs]})
     # live lookup for the Terminated view BEFORE the SOR 2+ filter
-    live = {(a["ent"], tnorm(a["site"])): a for a in agg}
+    live_by_ent = {}
+    for a in agg:
+        live_by_ent.setdefault(a["ent"], {})[tnorm(a["site"])] = a
     # SOR shows sites with 2+ unpaid only (same as the original dashboard)
     agg = [a for a in agg if not (a["ent"] == "SOR" and a["count"] < 2)]
     agg.sort(key=lambda x: (-x["count"], -x["total"]))
@@ -183,7 +231,8 @@ def build():
     except Exception:
         seed = []
     for s in seed:
-        a = live.get((s["ent"], tnorm(s["site"])))
+        ent_live = live_by_ent.get(s["ent"], {})
+        a = match_terminated(s["site"], ent_live, list(ent_live.items()))
         termi.append({
             "ent": s["ent"], "site": s["site"],
             "termdate": s.get("termdate", ""), "paid": a is None,
