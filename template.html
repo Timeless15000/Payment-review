@@ -83,7 +83,7 @@ th.n{text-align:right}
 .prtable tr.gapr td{color:#2e7d32;font-style:italic;background:#f4faf4}
 .od1{color:#8a949e}.od2{color:#e65100;font-weight:bold}.od3{color:#c1272d;font-weight:bold}
 .prtable td.amt,.prtable th.amt{text-align:right;white-space:nowrap}
-.prtable td.em{font-size:12px;word-break:break-all;max-width:190px}
+.prtable td.em{font-size:12px;word-break:break-all;max-width:255px;width:255px}
 .prbar{position:sticky;top:0;background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:8px 12px;margin:0 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.06)}
 .prbar button{border:none;border-radius:6px;padding:7px 14px;font-weight:bold;cursor:pointer;font-size:12px}
 .prbtn{background:#0B6E4F;color:#fff}.prsel{background:#e3e8ec;color:#333}
@@ -285,7 +285,7 @@ function renderPay(){
  var section=function(list,cls,title,sub,tagf){
   if(!list.length)return;
   h+='<h2 class="prh2 '+cls+'">'+title+' ('+list.length+') <small>'+sub+'</small></h2>';
-  h+='<table class="prtable"><thead><tr><th style="width:86px">Month</th><th style="width:120px">Invoice</th><th>Reference</th><th style="width:110px">Date</th><th style="width:96px">Overdue by</th><th class="amt" style="width:110px">Due AUD</th><th style="width:180px">Email</th></tr></thead><tbody>';
+  h+='<table class="prtable"><thead><tr><th style="width:80px">Month</th><th style="width:108px">Invoice</th><th>Reference</th><th style="width:100px">Date</th><th style="width:76px">Overdue</th><th class="amt" style="width:98px">Due AUD</th><th style="width:255px">Email</th></tr></thead><tbody>';
   list.forEach(function(o){
    var fu=prCu(o);var op=fu?' <a href="'+prEsc(fu)+'" target="_blank" rel="noopener" style="font-size:11px">open in Xero &#8599;</a>':'';
    h+='<tr class="cust"><td colspan="5">'+prEsc(o.c)+' <span class="prtag '+cls+'">'+tagf(o)+'</span>'+op+'</td><td class="amt">'+money(o.tot)+'</td><td class="em">'+(o.em?'<a href="mailto:'+prEsc(o.em)+'" title="Email in Outlook">'+prEsc(o.em)+'</a>':'')+'</td></tr>'+prRowsFor(o);
