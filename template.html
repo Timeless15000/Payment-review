@@ -89,7 +89,6 @@ th.n{text-align:right}
 .prbtn{background:#0B6E4F;color:#fff}.prsel{background:#e3e8ec;color:#333}
 .pdfck{transform:scale(1.15);margin-right:6px;vertical-align:-2px;cursor:pointer}
 .wwred{color:#c1272d;font-weight:bold}
-.prtable td:first-child,.prtable th:first-child{white-space:nowrap}
 .prnone{background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:14px}
 </style></head><body>
 <div id="gate"><div class="box"><div style="font-size:34px">&#128274;</div>
@@ -109,7 +108,7 @@ th.n{text-align:right}
 <div class="kpis" id="kpis"></div>
 <div class="controls">
 <div class="seg"><button id="bC" class="on" onclick="setSort('count')">Rank by count</button><button id="bA" onclick="setSort('total')">Rank by $ amount</button><button id="bT" onclick="setSort('termi')">&#128308; Terminated</button><button id="bP" onclick="setSort('pay')">&#128203; Payment Review</button></div>
-<input id="q" placeholder="Search site…" oninput="render()"><input id="payref" style="display:none;min-width:200px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:14px" placeholder="Ref filter: ww1, ww2, ww3 (empty = all)" oninput="payRefChanged()">
+<input id="q" placeholder="Search site…" oninput="render()"><input id="payref" style="display:none;min-width:200px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:14px" placeholder="Extra ref filter (optional)" oninput="payRefChanged()">
 </div>
 <div id="list"></div>
 <div class="foot">Combined receivables across all three Xero entities (TPM = Timeless Property Maintenance, SOR = SOR Services, TCC = Timeless Commercial Clean Sydney). Use the entity tabs to filter. Ranked by unpaid-invoice count (ties by amount); coloured badge red 5+, amber 3&ndash;4, blue 1&ndash;2. &ldquo;Unpaid from&rdquo; = oldest unpaid invoice&rsquo;s month. Refresh reloads the latest saved version; data auto-refreshes from Xero on weekdays at 9am & 1pm.</div>
@@ -119,7 +118,7 @@ const DATA=__DATA__;const ENAMES=__ENAMES__;const TERMI=__TERMI__;const PAY=__PA
 function money(n){return n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function cls(c){return c>=5?'c-hi':c>=3?'c-md':'c-lo'}
 function setSort(k){sortKey=k;document.getElementById('bC').classList.toggle('on',k==='count');document.getElementById('bA').classList.toggle('on',k==='total');document.getElementById('bT').classList.toggle('on',k==='termi');document.getElementById('bP').classList.toggle('on',k==='pay');document.getElementById('payref').style.display=(k==='pay')?'':'none';document.getElementById('q').placeholder=(k==='pay')?'Search customer…':'Search site…';render()}
-function setEnt(e){ent=e;teamF='ALL';[...document.querySelectorAll('#ents button')].forEach(b=>b.classList.toggle('on',b.dataset.e===e));render()}
+function setEnt(e){ent=e;teamF='ALL';try{payF='All';}catch(_e){}[...document.querySelectorAll('#ents button')].forEach(b=>b.classList.toggle('on',b.dataset.e===e));render()}
 function subset(){return ent==='ALL'?DATA:DATA.filter(x=>x.ent===ent)}
 function tabs(){
  const el=document.getElementById('ents');const LBL={TCC:'TCCS'};const order=['SOR','TCC','TPM','TF'];
@@ -185,7 +184,7 @@ function teamLabel(s){if(s.ent!=='SOR')return '';var out=teamsOf(s);return out.l
 var teamF='ALL';
 function teamOK(x){return !(ent==='SOR'&&teamF!=='ALL')||teamsOf(x).indexOf(teamF)>=0;}
 function setTeam(t){teamF=t;render();}
-function teamsBar(){var el=document.getElementById('teams');if(!el)return;if(ent!=='SOR'||sortKey==='pay'){el.style.display='none';el.innerHTML='';return;}el.style.display='';var opts=['ALL','Commercial','S1','S2','S3','S4','S5'];el.innerHTML=opts.map(function(t){return '<button class="'+(t===teamF?'on':'')+'" onclick="setTeam(\''+t+'\')">'+(t==='ALL'?'All':t)+'</button>';}).join('');}
+function teamsBar(){var el=document.getElementById('teams');if(!el)return;if(sortKey==='pay'){payTeamsBar(el);return;}if(ent!=='SOR'){el.style.display='none';el.innerHTML='';return;}el.style.display='';var opts=['ALL','Commercial','S1','S2','S3','S4','S5'];el.innerHTML=opts.map(function(t){return '<button class="'+(t===teamF?'on':'')+'" onclick="setTeam(\''+t+'\')">'+(t==='ALL'?'All':t)+'</button>';}).join('');}
 var TERMSET=new Set(TERMI.map(function(t){return t.ent+'|'+tnorm(t.site);}));
 /* ===== Payment Review view (ported from XERO bar Payment Review B9) ===== */
 var PRBUILD='P1';
@@ -195,11 +194,35 @@ function prEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g
 function prRef(r){var e=prEsc(r);return e.replace(/^(\s*)(ww)/i,'$1<span class="wwred">$2</span>');}
 function prOdH(d){if(d==null)return '';var c=d>=90?'od3':(d>=30?'od2':'od1');return '<span class="'+c+'">'+d+' days</span>';}
 function prDate(txt){var s=String(txt||'');var MN={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};var m=s.match(/(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{4})/);if(m){var mo=MN[m[2].toLowerCase()];if(mo)return new Date(parseInt(m[3],10),mo-1,parseInt(m[1],10));}return null;}
-(function(){try{var v=localStorage.getItem('xpay_rf');if(v===null)v='ww1, ww2, ww3';var el=document.getElementById('payref');if(el)el.value=v;}catch(e){}})();
-function payRefChanged(){try{localStorage.setItem('xpay_rf',document.getElementById('payref').value);}catch(e){}render();}
+(function(){try{var v=localStorage.getItem('xpay_rf2')||'';var el=document.getElementById('payref');if(el)el.value=v;}catch(e){}})();
+function payRefChanged(){try{localStorage.setItem('xpay_rf2',document.getElementById('payref').value);}catch(e){}render();}
+/* per-entity preset filters: [label, selector] — selector null=All, array=ref tokens, 'HOME'/'COM'/'RETAIL'=name rules */
+var PAYPRE={
+ SOR:[['All',null],['Work',['ww1','ww2','ww3']],['Commercial',['c2','c4']],['S2',['s2','g2']],['S3',['s3']],['S4',['s4','g4']],['S5',['s5','s6']]],
+ TCC:[['All',null],['Commercial','COM'],['Home','HOME']],
+ TPM:[['All',null],['Commercial','COM'],['Home','HOME']],
+ TF:[['All',null],['Retail','RETAIL']]
+};
+var payF='All';
+function setPayPre(t){payF=t;render();}
+function payTeamsBar(el){el.style.display='';var ps=PAYPRE[ent]||[['All',null]];
+ el.innerHTML=ps.map(function(p){return '<button class="'+(p[0]===payF?'on':'')+'" onclick="setPayPre(\''+p[0]+'\')">'+p[0]+'</button>';}).join('');}
+function payHomeName(n){return /^\.\.(?!\.)/.test(String(n||'').trim());}
+function payPreOK(x){
+ var ps=(PAYPRE[ent]||[]).filter(function(p){return p[0]===payF;})[0];
+ if(!ps||!ps[1])return true;
+ var sel=ps[1];
+ if(sel==='HOME')return payHomeName(x.c);
+ if(sel==='COM')return !payHomeName(x.c);
+ if(sel==='RETAIL')return String(x.c||'').indexOf('_')>=0;
+ var t=String(x.r||'');
+ for(var i=0;i<sel.length;i++){if(new RegExp('(^|[^A-Za-z0-9])'+sel[i]+'(?![0-9])','i').test(t))return true;}
+ return false;
+}
 function payRefRegexes(){var v=(document.getElementById('payref').value||'').replace(/^\s+|\s+$/g,'');if(!v)return null;var t=v.split(',').map(function(s){return s.replace(/^\s+|\s+$/g,'');}).filter(function(s){return s;});if(!t.length)return null;return t.map(function(s){return new RegExp('(^|[^A-Za-z0-9])'+s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^A-Za-z0-9]|$)','i');});}
 function payRows(){var rx=payRefRegexes();var q=(document.getElementById('q').value||'').toLowerCase();
  return PAY.filter(function(x){if(x.e!==ent)return false;
+  if(!payPreOK(x))return false;
   if(q&&String(x.c||'').toLowerCase().indexOf(q)<0)return false;
   if(rx){var t=String(x.r||''),hit=0;for(var i=0;i<rx.length;i++){if(rx[i].test(t)){hit=1;break;}}if(!hit)return false;}
   return true;});}
@@ -289,7 +312,7 @@ function prCsv(){
  var esc=function(v){var s=String(v==null?'':v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
  var txt='﻿'+rows.map(function(r){return r.map(esc).join(',');}).join('\r\n');
  var d=new Date(),z=function(n){return ('0'+n).slice(-2);};
- var name='Payment_Review_'+ent+'_'+z(d.getDate())+'-'+z(d.getMonth()+1)+'-'+String(d.getFullYear()).slice(-2)+'_'+z(d.getHours())+z(d.getMinutes())+'.csv';
+ var name='Payment_Review_'+ent+(payF!=='All'?'_'+payF:'')+'_'+z(d.getDate())+'-'+z(d.getMonth()+1)+'-'+String(d.getFullYear()).slice(-2)+'_'+z(d.getHours())+z(d.getMinutes())+'.csv';
  var b=new Blob([txt],{type:'text/csv;charset=utf-8'});
  var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
  setTimeout(function(){try{URL.revokeObjectURL(a.href);a.remove();}catch(e){}},1500);
