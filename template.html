@@ -74,16 +74,16 @@ th.n{text-align:right}
 .prh2{font-size:15px;margin:26px 0 8px;padding-left:9px;border-left:4px solid #13B5EA}
 .prh2.red{border-color:#c1272d}.prh2.or{border-color:#e65100}.prh2.ye{border-color:#c9a400}.prh2.bl{border-color:#1266a5}
 .prh2 small{color:#777;font-weight:normal;font-size:12px}
-.prtable{width:100%;border-collapse:collapse;background:#fff;border:1px solid #d9dee3;font-size:13px;margin-bottom:4px}
+.prtable{width:100%;table-layout:fixed;border-collapse:collapse;background:#fff;border:1px solid #d9dee3;font-size:13px;margin-bottom:4px}
 .prtable th{text-align:left;font-size:12px;color:#555;background:#f7f8f9;border-bottom:2px solid #d9dee3;padding:8px 10px;border-top:0}
 .prtable td{border-top:0;border-bottom:1px solid #e9edf0;padding:7px 10px;vertical-align:top}
-.prtable tr.cust td{background:#eef6fb;font-weight:bold;border-top:2px solid #cfe3ef}
+.prtable tr.cust td{background:#eef6fb;font-weight:bold;border-top:2px solid #cfe3ef;overflow-wrap:break-word}
 .prtag{font-weight:bold;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;white-space:nowrap}
 .prtag.red{background:#c1272d;color:#fff}.prtag.or{background:#e65100;color:#fff}.prtag.ye{background:#c9a400;color:#fff}.prtag.bl{background:#1266a5;color:#fff}
 .prtable tr.gapr td{color:#2e7d32;font-style:italic;background:#f4faf4}
 .od1{color:#8a949e}.od2{color:#e65100;font-weight:bold}.od3{color:#c1272d;font-weight:bold}
 .prtable td.amt,.prtable th.amt{text-align:right;white-space:nowrap}
-.prtable td.em{font-size:12px;word-break:break-all;max-width:255px;width:255px}
+.prtable td.em{font-size:12px;word-break:break-all}
 .prbar{position:sticky;top:0;background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:8px 12px;margin:0 0 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.06)}
 .prbar button{border:none;border-radius:6px;padding:7px 14px;font-weight:bold;cursor:pointer;font-size:12px}
 .prbtn{background:#0B6E4F;color:#fff}.prsel{background:#e3e8ec;color:#333}
@@ -169,7 +169,7 @@ th.n{text-align:right}
 <input id="q" placeholder="Search site…" oninput="render()"><input id="payref" style="display:none;min-width:200px;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:9px 12px;font-size:14px" placeholder="Extra ref filter (optional)" oninput="payRefChanged()">
 </div>
 <div id="list"></div>
-<div class="foot">Combined receivables across all three Xero entities (TPM = Timeless Property Maintenance, SOR = SOR Services, TCC = Timeless Commercial Clean Sydney). Use the entity tabs to filter. Ranked by unpaid-invoice count (ties by amount); coloured badge red 5+, amber 3&ndash;4, blue 1&ndash;2. &ldquo;Unpaid from&rdquo; = oldest unpaid invoice&rsquo;s month. Refresh reloads the latest saved version; data auto-refreshes from Xero on weekdays at 9am & 1pm.</div>
+<div class="foot">Combined receivables across all four Xero entities (TPM = Timeless Property Maintenance, SOR = SOR Services, TCC = Timeless Commercial Clean Sydney, TF = Teamforce). Use the entity tabs to filter. Ranked by unpaid-invoice count (ties by amount); coloured badge red 5+, amber 3&ndash;4, blue 1&ndash;2. &ldquo;Unpaid from&rdquo; = oldest unpaid invoice&rsquo;s month. Refresh reloads the latest saved version; data auto-refreshes from Xero on weekdays at 9am & 1pm.</div>
 </div>
 <script>
 const DATA=__DATA__;const ENAMES=__ENAMES__;const TERMI=__TERMI__;const PAY=__PAY__;const ORGSC=__ORGSC__;let sortKey='count';let ent='SOR';
