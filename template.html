@@ -105,6 +105,7 @@ th.n{text-align:right}
 .ablang button.on{background:#101828;color:#fff;border-color:#101828}
 .abfoot{margin-top:16px!important;color:#9aa6b2;font-size:11px;text-align:right;font-style:italic}
 .prnone{background:#fff;border:1px solid #d9dee3;border-radius:10px;padding:14px}
+.stmtbtn{display:inline-block;cursor:pointer;margin-left:8px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;border:1px solid #b9cdf0;background:#e8f0fd;color:#1e6fe0;vertical-align:middle;line-height:1.5;white-space:nowrap}.stmtbtn:hover{background:#d8e6fb}
 </style></head><body>
 <div id="about" onclick="if(event.target===this)this.style.display='none'">
 <div class="abx">
@@ -127,7 +128,7 @@ th.n{text-align:right}
 <b>TCCS / TPM</b> by customer name: Home = names starting with &ldquo;..&rdquo;, Commercial = everyone else.<br>
 <b>TF</b>: Retail = customers marked with &ldquo;_&rdquo;. Default is All; the search box finds customers, &ldquo;Extra ref filter&rdquo; accepts any reference.</p>
 <h4>Buttons</h4>
-<p><b>Excel</b> downloads the current list &middot; click an <b>email</b> to write to the customer &middot; <b>open in Xero</b> jumps to Xero &middot; <b>Download PDFs</b> saves ticked invoices (needs Xero login + the XERO bar).</p>
+<p><b>Excel</b> downloads the current list &middot; click an <b>email</b> to write to the customer &middot; <b>open in Xero</b> jumps to Xero &middot; <b>Download PDFs</b> saves ticked invoices (needs Xero login + the XERO bar) &middot; <b>Statement PDF</b> (customers with 2+ invoices) saves that customer&rsquo;s outstanding statement as one PDF (same requirements).</p>
 </div>
 <div id="ab-ko" style="display:none">
 <h3>이 대시보드 안내</h3>
@@ -146,7 +147,7 @@ th.n{text-align:right}
 <b>TCCS / TPM</b> 고객 이름으로: Home = 이름이 ".."로 시작, Commercial = 나머지 전부.<br>
 <b>TF</b>: Retail = 이름에 "_" 표시 있는 고객. 기본은 All, 검색창 = 고객 이름, Extra ref filter = reference 직접 입력.</p>
 <h4>버튼</h4>
-<p><b>Excel</b> = 현재 목록 다운로드 · <b>이메일</b> 클릭 = 바로 메일 쓰기 · <b>open in Xero</b> = Xero로 이동 · <b>Download PDFs</b> = 체크한 인보이스 PDF 저장 (Xero 로그인 + XERO 바 필요).</p>
+<p><b>Excel</b> = 현재 목록 다운로드 · <b>이메일</b> 클릭 = 바로 메일 쓰기 · <b>open in Xero</b> = Xero로 이동 · <b>Download PDFs</b> = 체크한 인보이스 PDF 저장 (Xero 로그인 + XERO 바 필요) · <b>Statement PDF</b> = 인보이스 2개 이상인 고객에 표시 — 그 고객의 미납 statement 전체를 PDF 한 장으로 저장 (같은 조건).</p>
 </div>
 <p class="abfoot">created by Sumi</p>
 </div></div>
@@ -246,7 +247,7 @@ function setTeam(t){teamF=t;render();}
 function teamsBar(){var el=document.getElementById('teams');if(!el)return;if(sortKey==='pay'){payTeamsBar(el);return;}if(ent!=='SOR'){el.style.display='none';el.innerHTML='';return;}el.style.display='';var opts=['ALL','Commercial','S1','S2','S3','S4','S5'];el.innerHTML=opts.map(function(t){return '<button class="'+(t===teamF?'on':'')+'" onclick="setTeam(\''+t+'\')">'+(t==='ALL'?'All':t)+'</button>';}).join('');}
 var TERMSET=new Set(TERMI.map(function(t){return t.ent+'|'+tnorm(t.site);}));
 /* ===== Payment Review view (ported from XERO bar Payment Review B9) ===== */
-var PRBUILD='P1';
+var PRBUILD='P2';
 var MTP=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function mtxtP(k){return MTP[k%12]+' '+Math.floor(k/12);}
 function prEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -346,8 +347,8 @@ function renderPay(){
   h+='<h2 class="prh2 '+cls+'">'+title+' ('+list.length+') <small>'+sub+'</small></h2>';
   h+='<table class="prtable"><thead><tr><th style="width:80px">Month</th><th style="width:108px">Invoice</th><th>Reference</th><th style="width:100px">Date</th><th style="width:76px">Overdue</th><th class="amt" style="width:98px">Due AUD</th><th style="width:255px">Email</th></tr></thead><tbody>';
   list.forEach(function(o){
-   var fu=prCu(o);var op=fu?' <a href="'+prEsc(fu)+'" target="_blank" rel="noopener" style="font-size:11px">open in Xero &#8599;</a>':'';
-   h+='<tr class="cust"><td colspan="5">'+prEsc(o.c)+' <span class="prtag '+cls+'">'+tagf(o)+'</span>'+op+'</td><td class="amt">'+money(o.tot)+'</td><td class="em">'+(o.em?'<a href="mailto:'+prEsc(o.em)+'" title="Email in Outlook">'+prEsc(o.em)+'</a>':'')+'</td></tr>'+prRowsFor(o);
+   var fu=prCu(o);var op=fu?' <a href="'+prEsc(fu)+'" target="_blank" rel="noopener" style="font-size:11px">open in Xero &#8599;</a>':'';var stb=(o.arr.length>=2&&o.cid)?' <span class="stmtbtn" data-cid="'+prEsc(o.cid)+'" data-name="'+escAttr(o.c)+'" onclick="prStmtGo(event,this)" title="Download this customer&#39;s outstanding statement as one PDF (needs Xero login + the XERO bar)">Statement PDF</span>':'';
+   h+='<tr class="cust"><td colspan="5">'+prEsc(o.c)+' <span class="prtag '+cls+'">'+tagf(o)+'</span>'+op+stb+'</td><td class="amt">'+money(o.tot)+'</td><td class="em">'+(o.em?'<a href="mailto:'+prEsc(o.em)+'" title="Email in Outlook">'+prEsc(o.em)+'</a>':'')+'</td></tr>'+prRowsFor(o);
   });
   h+='</tbody></table>';
  };
@@ -385,6 +386,9 @@ if(!window.__prHk){window.__prHk=1;
  document.addEventListener('click',function(e){var t=e.target;if(!t||!/pdfck/.test(t.className||''))return;var all=prAll();var idx=all.indexOf(t);if(e.shiftKey&&prLastCk!==null&&prLastCk>=0&&idx>=0){var a=Math.min(prLastCk,idx),b=Math.max(prLastCk,idx);for(var i=a;i<=b;i++)all[i].checked=t.checked;}prLastCk=idx;prCnt();});
  document.addEventListener('mousedown',function(e){if(e.shiftKey&&e.target&&/pdfck/.test(e.target.className||''))e.preventDefault();});
 }
+function prStmtGo(ev,el){ev.stopPropagation();var cid=el.getAttribute('data-cid');var nm=el.getAttribute('data-name')||'customer';var picks=[{sid:cid,num:('Statement - '+nm).replace(/[^A-Za-z0-9._ -]+/g,' ').trim()}];var w=null;try{w=window.open('https://go.xero.com/AccountsReceivable/Search.aspx#xpdf='+encodeURIComponent(JSON.stringify(picks)),'_blank');}catch(e){}
+ if(w){alert('A Xero tab has opened - the statement PDF downloads automatically there.\nNeeds: Xero login to '+(ENAMES[ent]||ent)+' + the XERO bar.\n(Xero 탭이 열렸어요 - statement PDF가 자동 다운로드됩니다. '+(ENAMES[ent]||ent)+' 로그인 + XERO 바 필요)');}
+ else{alert('Popup blocked - allow pop-ups for this page and press the button again.\n(팝업이 차단됐어요 - 팝업 허용 후 다시 눌러주세요)');}}
 function prPdfGo(){
  var picks=prAll().filter(function(c){return c.checked;}).map(function(c){return {id:c.getAttribute('data-id'),num:c.getAttribute('data-num')};});
  if(!picks.length){alert('No invoices ticked - tick the checkboxes first. (원하는 인보이스에 먼저 체크하세요)');return;}
