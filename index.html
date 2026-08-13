@@ -153,14 +153,13 @@ th.n{text-align:right}
 </div></div>
 <script>function abLang(l){document.getElementById('ab-en').style.display=(l==='en')?'':'none';document.getElementById('ab-ko').style.display=(l==='ko')?'':'none';document.getElementById('abbe').classList.toggle('on',l==='en');document.getElementById('abbk').classList.toggle('on',l==='ko');}</script><div id="gate"><div class="box"><div style="font-size:34px">&#128274;</div>
 <h2 style="margin:10px 0 2px;font-size:18px">Outstanding Invoices</h2>
-<div style="color:#6b7885;font-size:13px">Enter password to view</div>
-<input id="gp" type="password" placeholder="Password" autofocus>
-<div class="err" id="ge"></div><button onclick="unlock()">View dashboard</button></div></div><div class="wrap">
+<div style="color:#6b7885;font-size:13px">Redirecting to Xero sign-in&hellip;</div>
+<div style="margin-top:14px"><a href="https://payment-review.timelessclean5000.workers.dev/" style="color:#1e6fe0;font-size:13px">Continue to sign-in</a></div></div></div><div class="wrap">
 <div class="topbar">
  <div><h1>Outstanding Invoices <button class="aboutbtn" onclick="document.getElementById('about').style.display='flex'">About</button></h1>
  <div class="sub">Timeless Group · 4 Xero entities · snapshot as at 13 Aug 2026 (AEST) &middot; SOR shows sites with 2+ unpaid</div></div>
  <div class="tr">
-   <span class="updated"><span class="dot"></span>Updated 13 Aug 2026 · 2:58 PM AEST</span>
+   <span class="updated"><span class="dot"></span>Updated 13 Aug 2026 · 2:35 PM AEST</span>
  </div>
 </div>
 <div class="ent-tabs" id="ents"></div>
@@ -247,7 +246,7 @@ function setTeam(t){teamF=t;render();}
 function teamsBar(){var el=document.getElementById('teams');if(!el)return;if(sortKey==='pay'){payTeamsBar(el);return;}if(ent!=='SOR'){el.style.display='none';el.innerHTML='';return;}el.style.display='';var opts=['ALL','Commercial','S1','S2','S3','S4','S5'];el.innerHTML=opts.map(function(t){return '<button class="'+(t===teamF?'on':'')+'" onclick="setTeam(\''+t+'\')">'+(t==='ALL'?'All':t)+'</button>';}).join('');}
 var TERMSET=new Set(TERMI.map(function(t){return t.ent+'|'+tnorm(t.site);}));
 /* ===== Payment Review view (ported from XERO bar Payment Review B9) ===== */
-var PRBUILD='P2';
+var PRBUILD='P3';
 var MTP=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function mtxtP(k){return MTP[k%12]+' '+Math.floor(k/12);}
 function prEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -387,7 +386,7 @@ if(!window.__prHk){window.__prHk=1;
  document.addEventListener('mousedown',function(e){if(e.shiftKey&&e.target&&/pdfck/.test(e.target.className||''))e.preventDefault();});
 }
 function prStmtGo(ev,el){ev.stopPropagation();var cid=el.getAttribute('data-cid');var nm=el.getAttribute('data-name')||'customer';var picks=[{sid:cid,num:('Statement - '+nm).replace(/[^A-Za-z0-9._ -]+/g,' ').trim()}];var w=null;try{w=window.open('https://go.xero.com/AccountsReceivable/Search.aspx#xpdf='+encodeURIComponent(JSON.stringify(picks)),'_blank');}catch(e){}
- if(w){alert('A Xero tab has opened - the statement PDF downloads automatically there.\nNeeds: Xero login to '+(ENAMES[ent]||ent)+' + the XERO bar.\n(Xero 탭이 열렸어요 - statement PDF가 자동 다운로드됩니다. '+(ENAMES[ent]||ent)+' 로그인 + XERO 바 필요)');}
+ if(w){var _o=el.textContent;el.textContent='✓ downloading…';setTimeout(function(){try{el.textContent=_o;}catch(_e){}},5000);}
  else{alert('Popup blocked - allow pop-ups for this page and press the button again.\n(팝업이 차단됐어요 - 팝업 허용 후 다시 눌러주세요)');}}
 function prPdfGo(){
  var picks=prAll().filter(function(c){return c.checked;}).map(function(c){return {id:c.getAttribute('data-id'),num:c.getAttribute('data-num')};});
@@ -399,10 +398,7 @@ function prPdfGo(){
 /* ===== end Payment Review view ===== */
 tabs();render();
 </script><script>
-const HASH="9198fe8e61d5a7739bb28a1ee51f4cff9b186b6cd0638a92881014495adf81d6";
-async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
-async function unlock(){const v=document.getElementById('gp').value;if(await sha(v)===HASH){sessionStorage.setItem('ok','1');document.getElementById('gate').classList.add('hidden');}else{document.getElementById('ge').textContent='Wrong password';}}
 if(sessionStorage.getItem('ok')==='1'){document.getElementById('gate').classList.add('hidden');}
-window.addEventListener('load',()=>{const gp=document.getElementById('gp');if(gp)gp.addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});});
+else{location.replace('https://payment-review.timelessclean5000.workers.dev/');}
 </script>
 </body></html>
