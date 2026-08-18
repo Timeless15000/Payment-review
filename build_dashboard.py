@@ -59,6 +59,11 @@ def refresh(rt):
                 last = RuntimeError(f"Xero returned {r.status_code}")
                 time.sleep(5 * (attempt + 1))
                 continue
+            if r.status_code >= 400:
+                # Xero's body says WHY: invalid_grant (token dead or already
+                # used) vs invalid_client (client id/secret don't match).
+                print(f"Xero {r.status_code} body: {r.text[:300]}", flush=True)
+                raise RuntimeError(f"Xero {r.status_code} {r.text[:200]}")
             r.raise_for_status()
             tok = r.json()
             _save(tok["refresh_token"])
