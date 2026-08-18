@@ -10,7 +10,7 @@ Environment variables (provided by GitHub Actions secrets):
 The refresh token rotates each run; the new one is written to token.json,
 which the workflow commits back to the repo.
 """
-import os, json, base64, datetime, re
+import os, json, base64, datetime, re, time
 from zoneinfo import ZoneInfo
 import requests
 
@@ -35,22 +35,64 @@ def entity_code(tenant_name):
     return None
 
 
-def load_refresh_token():
-    if os.path.exists("token.json"):
-        return json.load(open("token.json"))["refresh_token"]
-    return os.environ["XERO_REFRESH_TOKEN"]
+def _save(rt):
+    json.dump({"refresh_token": rt}, open("token.json", "w"))
 
 
 def refresh(rt):
+    """Swap a refresh token for an access token, retrying transient errors.
+
+    The new refresh token is written to token.json IMMEDIATELY, and the
+    workflow commits it even when a later step fails - otherwise one bad
+    run would silently burn the token and break every run after it.
+    """
     basic = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
-    r = requests.post("https://identity.xero.com/connect/token",
-        headers={"Authorization": f"Basic {basic}",
-                 "Content-Type": "application/x-www-form-urlencoded"},
-        data={"grant_type": "refresh_token", "refresh_token": rt})
-    r.raise_for_status()
-    tok = r.json()
-    json.dump({"refresh_token": tok["refresh_token"]}, open("token.json", "w"))
-    return tok["access_token"]
+    last = None
+    for attempt in range(3):
+        try:
+            r = requests.post("https://identity.xero.com/connect/token",
+                headers={"Authorization": f"Basic {basic}",
+                         "Content-Type": "application/x-www-form-urlencoded"},
+                data={"grant_type": "refresh_token", "refresh_token": rt},
+                timeout=30)
+            if r.status_code == 429 or r.status_code >= 500:
+                last = RuntimeError(f"Xero returned {r.status_code}")
+                time.sleep(5 * (attempt + 1))
+                continue
+            r.raise_for_status()
+            tok = r.json()
+            _save(tok["refresh_token"])
+            return tok["access_token"]
+        except requests.RequestException as e:
+            last = e
+            time.sleep(5 * (attempt + 1))
+    raise last
+
+
+def get_access_token():
+    """token.json first, then the XERO_REFRESH_TOKEN secret as a backup.
+
+    Falling back means a single dead token no longer needs a manual
+    GET_TOKEN.bat run - the schedule heals itself on the next attempt.
+    """
+    tried = []
+    if os.path.exists("token.json"):
+        try:
+            return refresh(json.load(open("token.json"))["refresh_token"])
+        except Exception as e:
+            tried.append(f"token.json -> {e}")
+            print("token.json refresh failed:", e, flush=True)
+    backup = os.environ.get("XERO_REFRESH_TOKEN", "").strip()
+    if backup:
+        try:
+            access = refresh(backup)
+            print("Recovered using the XERO_REFRESH_TOKEN secret.", flush=True)
+            return access
+        except Exception as e:
+            tried.append(f"XERO_REFRESH_TOKEN -> {e}")
+    raise SystemExit("Xero auth failed. Re-run GET_TOKEN.bat and update "
+                     "token.json + the XERO_REFRESH_TOKEN secret. "
+                     + " | ".join(tried))
 
 
 def api_get(access, tenant_id, path, params=None):
@@ -166,7 +208,7 @@ def match_terminated(site, live, live_items):
 
 
 def build():
-    access = refresh(load_refresh_token())
+    access = get_access_token()
     tenants = get_tenants(access)
     today = datetime.datetime.now(ZoneInfo("Australia/Sydney")).date()
     rows = []
