@@ -28,10 +28,26 @@ jobs:
           XERO_CLIENT_SECRET: ${{ secrets.XERO_CLIENT_SECRET }}
           XERO_REFRESH_TOKEN: ${{ secrets.XERO_REFRESH_TOKEN }}
         run: python build_dashboard.py
+      # Runs even when the build failed: the Xero refresh token rotates the
+      # moment it is used, so it MUST be committed or every later run dies.
       - name: Commit result
+        if: always()
         run: |
+          [ -d .git ] || exit 0
           git config user.name "dashboard-bot"
           git config user.email "actions@github.com"
-          git add index.html token.json
-          git diff --cached --quiet || git commit -m "Auto update dashboard"
-          git push
+          git add index.html token.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "Auto update dashboard"
+          for i in 1 2 3; do
+            if git pull --rebase --autostash && git push; then
+              echo "Pushed."
+              exit 0
+            fi
+            echo "Push attempt $i failed, retrying..."
+            sleep 5
+          done
+          exit 1
