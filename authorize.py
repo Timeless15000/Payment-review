@@ -14,7 +14,7 @@ TICK ALL FOUR organisations (TPM, SOR, TCC, TF/Teamforce) -> Allow.
 The script prints your REFRESH TOKEN. Copy it; you'll paste it into GitHub
 as the secret XERO_REFRESH_TOKEN.
 """
-import os, base64, secrets, urllib.parse, webbrowser, http.server, threading, requests
+import os, json, base64, secrets, urllib.parse, webbrowser, http.server, threading, requests
 
 CLIENT_ID = os.environ["XERO_CLIENT_ID"]
 CLIENT_SECRET = os.environ["XERO_CLIENT_SECRET"]
@@ -56,10 +56,17 @@ def main():
         data={"grant_type": "authorization_code", "code": code, "redirect_uri": REDIRECT})
     r.raise_for_status()
     tok = r.json()
+    # Write token.json right here so nobody has to copy/paste the token by
+    # hand. The old version only PRINTED it, so the token.json sitting next
+    # to this script stayed stale forever and every upload was a dead token.
+    with open("token.json", "w") as f:
+        json.dump({"refresh_token": tok["refresh_token"]}, f)
     print("\n==================  YOUR REFRESH TOKEN  ==================\n")
     print(tok["refresh_token"])
     print("\n==========================================================")
-    print("Copy the line above into GitHub as the secret  XERO_REFRESH_TOKEN")
+    print("Saved to token.json in this folder (" + os.path.abspath("token.json") + ").")
+    print("Upload that token.json to the Payment-review repo, then Run workflow.")
+    print("Use it NOW - a Xero refresh token dies the moment anything else uses it.")
 
 if __name__ == "__main__":
     main()
