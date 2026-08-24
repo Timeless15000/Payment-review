@@ -257,7 +257,7 @@ function prDate(txt){var s=String(txt||'');var MN={jan:1,feb:2,mar:3,apr:4,may:5
 function payRefChanged(){try{localStorage.setItem('xpay_rf2',document.getElementById('payref').value);}catch(e){}render();}
 /* per-entity preset filters: [label, selector] — selector null=All, array=ref tokens, 'HOME'/'COM'/'RETAIL'=name rules */
 var PAYPRE={
- SOR:[['All',null],['Work',['ww1','ww2','ww3']],['Commercial',['c2','c4']],['S2',['s2','g2']],['S3',['s3']],['S4',['s4','g4']],['S5',['s5','s6']]],
+ SOR:[['All',null],['Work',['ww1','ww2','ww3','www']],['Commercial',['c2','c4']],['S2',['s2','g2']],['S3',['s3']],['S4',['s4','g4']],['S5',['s5','s6']]],
  TCC:[['All',null],['Commercial','COM'],['Home','HOME']],
  TPM:[['All',null],['Commercial','COM'],['Home','HOME']],
  TF:[['All',null],['Retail','RETAIL']]
